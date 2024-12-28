@@ -168,6 +168,34 @@ class Game(Screen):
         screen.blit(questions_text, (WIDTH // 2 - questions_text.get_width() // 2, HEIGHT - 150))
 
         pygame.display.flip()
+
+         if self.incorrect_count >= 3:
+            self.game_over_screen()
+
+        pygame.time.delay(1000)
+        if self.running and self.incorrect_count < 3:
+            self.game_loop()
+
+    def game_over_screen(self):
+        screen.fill(background_color)
+        game_over_text = TITLE_FONT.render("Game Over!", True, RED)
+        score_text = FONT.render(f"Your Score: {self.score}", True, BLACK)
+        questions_text = FONT.render(f"Questions Answered: {self.questions_answered}", True, BLACK)
+
+        memory_category = self.determine_memory_category(self.score)
+        memory_text = FONT.render(f"YOUR MEMORY: {memory_category}", True, BLACK)
+
+        screen.blit(game_over_text, (WIDTH // 2 - game_over_text.get_width() // 2, HEIGHT // 3))
+        screen.blit(score_text, (WIDTH // 2 - score_text.get_width() // 2, HEIGHT // 2))
+        screen.blit(questions_text, (WIDTH // 2 - questions_text.get_width() // 2, HEIGHT // 2 + 60))
+        screen.blit(memory_text, (WIDTH // 2 - memory_text.get_width() // 2, HEIGHT // 2 + 120))
+
+        self.draw_button("Leaderboard", WIDTH // 2 - 80, HEIGHT - 100, 160, 40, DARK_BLUE, (0, 0, 100))
+        self.draw_button("Restart", WIDTH // 2 - 160, HEIGHT - 50, 120, 40, DARK_BLUE, (0, 0, 100))
+        self.draw_button("Exit", WIDTH // 2 + 40, HEIGHT - 50, 120, 40, DARK_BLUE, (0, 0, 100))
+
+        pygame.display.flip()
+        
         waiting_for_restart = True
         while waiting_for_restart:
             for event in pygame.event.get():
