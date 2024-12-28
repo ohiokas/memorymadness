@@ -102,23 +102,20 @@ class Game(Screen):
         else:
             return "Spechless"
 
-    # Loop utama game
     def game_loop(self):
         clock = pygame.time.Clock()
         self.letters_to_remember = self.generate_random_characters(self.level + 4)
         self.user_input = ""
 
-        # Menampilkan karakter untuk diingat
         display_time = 2
         start_time = time.time()
-        
+
         while time.time() - start_time < display_time:
             screen.fill(background_color)
             self.display_text(self.letters_to_remember, FONT, BLACK)
             pygame.display.flip()
             clock.tick(60)
 
-        # Minta input pengguna
         input_prompt = SMALL_FONT.render("Masukkan urutan karakter:", True, input_color)
         screen.fill(background_color)
         screen.blit(input_prompt, (50, 100))
@@ -131,78 +128,6 @@ class Game(Screen):
                 if event.type == pygame.QUIT:
                     self.running = False
                     return
-
-                if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_RETURN:  # Tekan Enter untuk submit
-                        if self.user_input == self.letters_to_remember:
-                            self.correct_answers += 1
-                            self.score += 10
-                            self.questions_answered += 1
-                            if self.correct_answers % 5 == 0:
-                                self.level += 1
-                        else:
-                            self.incorrect_count += 1
-                            self.score -= 5
-                            self.questions_answered += 1
-                        waiting_for_input = False
-
-                    elif event.key == pygame.K_BACKSPACE:
-                        self.user_input = self.user_input[:-1]
-
-                    elif len(self.user_input) < len(self.letters_to_remember):
-                        self.user_input += event.unicode.upper()
-
-            screen.fill(background_color)
-            self.display_text(self.user_input, FONT, input_color, y_offset=100)
-            pygame.display.flip()
-            clock.tick(60)
-
-        # Feedback dan menampilkan skor
-        screen.fill(background_color)
-        if self.user_input == self.letters_to_remember:
-            feedback_text = SMALL_FONT.render("Correct! +10 points", True, correct_color)
-        else:
-            feedback_text = SMALL_FONT.render("Incorrect! -5 points", True, incorrect_color)
-
-        score_text = SMALL_FONT.render(f"Score: {self.score}", True, BLACK)
-        level_text = SMALL_FONT.render(f"Level: {self.level}", True, BLACK)
-        questions_text = SMALL_FONT.render(f"Questions Answered: {self.questions_answered}", True, BLACK)
-        screen.blit(feedback_text, (WIDTH // 2 - feedback_text.get_width() // 2, HEIGHT // 2 + 50))
-        screen.blit(score_text, (50, 50))
-        screen.blit(level_text, (WIDTH - level_text.get_width() - 50, 50))
-        screen.blit(questions_text, (WIDTH // 2 - questions_text.get_width() // 2, HEIGHT - 150))
-
-        pygame.display.flip()
-
-        if self.incorrect_count >= 3:
-            self.game_over_screen()
-
-        pygame.time.delay(1000)
-        if self.running and self.incorrect_count < 3:
-            self.game_loop()
-
-    # Layar Game Over
-    def game_over_screen(self):
-        screen.fill(background_color)
-        game_over_text = TITLE_FONT.render("Game Over!", True, RED)
-        score_text = FONT.render(f"Your Score: {self.score}", True, BLACK)
-        questions_text = FONT.render(f"Questions Answered: {self.questions_answered}", True, BLACK)
-
-        # Menentukan kategori berdasarkan skor
-        memory_category = self.determine_memory_category(self.score)
-        memory_text = FONT.render(f"YOUR MEMORY: {memory_category}", True, BLACK)
-
-        screen.blit(game_over_text, (WIDTH // 2 - game_over_text.get_width() // 2, HEIGHT // 3))
-        screen.blit(score_text, (WIDTH // 2 - score_text.get_width() // 2, HEIGHT // 2))
-        screen.blit(questions_text, (WIDTH // 2 - questions_text.get_width() // 2, HEIGHT // 2 + 60))
-        screen.blit(memory_text, (WIDTH // 2 - memory_text.get_width() // 2, HEIGHT // 2 + 120))
-
-        # Tombol Restart dan Quit lebih kecil dan disusun secara horizontal
-        self.draw_button("Restart", WIDTH // 2 - 160, HEIGHT - 100, 120, 40, DARK_BLUE, (0, 0, 100))
-        self.draw_button("Exit", WIDTH // 2 + 40, HEIGHT - 100, 120, 40, DARK_BLUE, (0, 0, 100))
-
-        pygame.display.flip()
-
         waiting_for_restart = True
         while waiting_for_restart:
             for event in pygame.event.get():
