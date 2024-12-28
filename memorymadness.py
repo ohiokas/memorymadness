@@ -128,6 +128,46 @@ class Game(Screen):
                 if event.type == pygame.QUIT:
                     self.running = False
                     return
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_RETURN:
+                        if self.user_input == self.letters_to_remember:
+                            self.correct_answers += 1
+                            self.score += 10
+                            self.questions_answered += 1
+                            if self.correct_answers % 5 == 0:
+                                self.level += 1
+                        else:
+                            self.incorrect_count += 1
+                            self.score -= 5
+                            self.questions_answered += 1
+                        waiting_for_input = False
+
+                    elif event.key == pygame.K_BACKSPACE:
+                        self.user_input = self.user_input[:-1]
+
+                    elif len(self.user_input) < len(self.letters_to_remember):
+                        self.user_input += event.unicode.upper()
+
+            screen.fill(background_color)
+            self.display_text(self.user_input, FONT, input_color, y_offset=100)
+            pygame.display.flip()
+            clock.tick(60)
+
+        screen.fill(background_color)
+        if self.user_input == self.letters_to_remember:
+            feedback_text = SMALL_FONT.render("Correct! +10 points", True, correct_color)
+        else:
+            feedback_text = SMALL_FONT.render("Incorrect! -5 points", True, incorrect_color)
+
+        score_text = SMALL_FONT.render(f"Score: {self.score}", True, BLACK)
+        level_text = SMALL_FONT.render(f"Level: {self.level}", True, BLACK)
+        questions_text = SMALL_FONT.render(f"Questions Answered: {self.questions_answered}", True, BLACK)
+        screen.blit(feedback_text, (WIDTH // 2 - feedback_text.get_width() // 2, HEIGHT // 2 + 50))
+        screen.blit(score_text, (50, 50))
+        screen.blit(level_text, (WIDTH - level_text.get_width() - 50, 50))
+        screen.blit(questions_text, (WIDTH // 2 - questions_text.get_width() // 2, HEIGHT - 150))
+
+        pygame.display.flip()
         waiting_for_restart = True
         while waiting_for_restart:
             for event in pygame.event.get():
